@@ -1,0 +1,199 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; 
+    align-items: center;
+}
+nav{
+   margin-right: 30px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        grid-template-columns: 1fr; /* Stack elements on smaller screens */
+        text-align: center;
+    }
+}
+header {
+    background-color: #0b315a;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+nav{
+    padding-top: -190px;
+    margin-bottom: 60px;
+}
+header{
+    height: 100px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    margin: 20px auto;
+    padding: 50px 20px;
+
+}
+
+.feature{
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid grey;
+    padding: 50px;
+}
+.event_creation, .vendor-mgt, .report-generation{
+    margin-left: 50px;
+}
+.budget-tracking, .venue-selection{
+    margin-right: 50px;
+}
+.feature-content {
+    margin-top: 100px;
+    margin-left: 30px;
+    padding-bottom: 50px;
+}
+
+.feature-list {
+    list-style: disc;
+    padding: 0;
+}
+
+.feature-list li {
+    margin-bottom: 5px;
+}
+.feature-image{
+    width: 450px;
+    height: 350px;
+    border: 3px solid white;
+    box-shadow: 0 0 5px black;
+    border-radius: 7px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+
+    .feature {
+        flex-direction: column;
+    }
+
+    .feature-image {
+        width: 100%;
+    }
+
+    .feature-content {
+        width: 100%;
+    }
+}
+footer {
+    background-color: #333;
+    color: white;
+    padding: 50px 20px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.contact-form, .sitemap {
+    width: 300px;
+    padding-bottom: 20px;
+}
+
+.contact-form input, .contact-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #555;
+}
+
+.contact-form button {
+    background-color: rgb(54, 112, 247);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 10px;
+    background-color: black;
+    padding-bottom: 5px;
+    color: white;
+}
+.logo{
+    width: 170px;
+    height: 170px;
+}
+.company-info{
+    padding-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .feature-list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .feature {
+        width: 90%;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .contact-form, .sitemap, .company-info {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+}
+h2{
+    font-size: 50px;
+}
+.icons{
+    width: 18px;
+    height: 18px;
+}
+.address{
+    display: flex;
+}
+.info{
+    margin-top: -0px;
+    margin-left: 10px;
+}
+h2, h3{
+    font-size: 45px;
+}
+.word{
+    font-size: 20px;
+}

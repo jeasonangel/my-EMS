@@ -1,0 +1,238 @@
+/* General body styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4; 
+    color: #333; 
+  }
+  header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Adjust grid columns as needed */
+    align-items: center;
+}
+nav{
+   margin-right: 30px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        grid-template-columns: 1fr; /* Stack elements on smaller screens */
+        text-align: center;
+    }
+}
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) { 
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        width: 50%; /* Make them narrower on larger screens */
+    }
+}
+.responsive-table {
+    width: 100%;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    display: block; /* Important for overflow to work correctly */
+}
+
+.responsive-table table {
+    width: 100%; 
+    border-collapse: collapse;
+}
+
+.responsive-table th,
+.responsive-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+header {
+    background-color: #0b315a;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+nav{
+    padding-top: -190px;
+    margin-bottom: 60px;
+}
+header{
+    height: 100px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+  
+  /* Container for main content */
+  .container {
+    width: 80%;
+    max-width: 800px; /* Limit container width for larger screens */
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Headings */
+  h2 {
+    color: #0b315a; 
+    text-align: center;
+  }
+form{
+    padding-right: 30px;
+}
+  
+  /* Form elements */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="number"],
+  input[type="file"],
+  select,
+  textarea {
+    display: block;
+    margin: 10px 0;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Buttons */
+  button {
+    background-color: rgb(54, 112, 247); 
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Links */
+  a {
+    color: rgb(54, 112, 247);
+    text-decoration: none;
+  }
+  
+  /* Lists */
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  /* Error and success messages */
+  .error {
+    color: red;
+  }
+  
+  .success {
+    color: green;
+  }
+  footer {
+    background-color: #333;
+    color: white;
+    padding: 50px 20px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.contact-form, .sitemap {
+    width: 300px;
+    padding-bottom: 20px;
+}
+
+.contact-form input, .contact-form textarea{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #555;
+}
+#name, #email{
+    border-radius: 0px;
+}
+.submit{
+    border-radius: 0px;
+    width: 70px;
+}
+.contact-form button {
+    background-color: rgb(54, 112, 247);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 10px;
+    background-color: black;
+    padding-bottom: 5px;
+    color: white;
+}
+.logo{
+    width: 170px;
+    height: 170px;
+}
+.company-info{
+    padding-bottom: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .contact-form, .sitemap, .company-info {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+}
+h2{
+    font-size: 50px;
+}
+.icons{
+    width: 18px;
+    height: 18px;
+}
+.address{
+    display: flex;
+}
+.info{
+    margin-top: -0px;
+    margin-left: 10px;
+}
