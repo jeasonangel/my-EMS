@@ -27,48 +27,59 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Dashboard</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+          integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #f8f9fa;
+            color: #495057;
             margin: 0;
             padding: 0;
-            color: #333;
         }
 
         header {
-            background-color: #0b3d60;
+            background-color: #343a40;
             color: white;
             padding: 1rem 0;
+        }
+
+        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        header .logo {
-            max-height: 50px;
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
         }
 
-        header nav ul {
+        .navbar-nav {
             list-style: none;
-            padding: 0;
-            margin: 0;
             display: flex;
+            margin-left: auto;
         }
 
-        header nav ul li {
+        .nav-item {
             margin-left: 20px;
         }
 
-        header nav ul li a {
+        .nav-link {
             color: white;
             text-decoration: none;
             transition: color 0.3s ease;
         }
 
-        header nav ul li a:hover {
-            color: #ddd;
+        .nav-link:hover {
+            color: #f8f9fa;
         }
 
         .container {
@@ -78,19 +89,18 @@ $conn->close();
             background-color: #fff;
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
-            color: #0b3d60;
+            color: #007bff;
             margin-bottom: 20px;
-            border-bottom: 2px solid #0b3d60;
+            border-bottom: 2px solid #007bff;
             padding-bottom: 10px;
         }
 
         h3 {
-            font-size: 24px;
-            color: #0b3d60;
+            color: #28a745;
             margin-top: 25px;
             margin-bottom: 15px;
         }
@@ -114,9 +124,9 @@ $conn->close();
         }
 
         th {
-            background-color: #f8f8f8;
+            background-color: #f8f9fa;
             font-weight: bold;
-            color: #555;
+            color: #495057;
         }
 
         tbody tr:nth-child(even) {
@@ -125,7 +135,7 @@ $conn->close();
 
         .action-btn {
             display: inline-block;
-            padding: 10px 15px;
+            padding: 8px 12px;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
@@ -139,15 +149,32 @@ $conn->close();
         }
 
         .success-message {
-            color: green;
+            color: #28a745;
             margin-top: 15px;
             display: block;
         }
 
+        .logout-btn {
+            background-color: #dc3545;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        .add-product-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .add-product-link:hover {
+            text-decoration: underline;
+        }
+
         footer {
-            background-color: #333;
+            background-color: #343a40;
             color: white;
-            padding: 30px 0;
+            padding: 40px 0;
             margin-top: 40px;
         }
 
@@ -159,28 +186,37 @@ $conn->close();
             padding: 0 20px;
         }
 
-        .footer-content h4 {
-            color: #eee;
-            border-bottom: 1px solid #555;
+        .footer-section {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .footer-section:last-child {
+            margin-right: 0;
+        }
+
+        .footer-section h4 {
+            color: #f8f9fa;
+            border-bottom: 1px solid #6c757d;
             padding-bottom: 10px;
             margin-bottom: 15px;
         }
 
-        .footer-content ul {
+        .footer-section ul {
             list-style: none;
             padding: 0;
         }
 
-        .footer-content ul li a {
-            color: #ccc;
+        .footer-section ul li a {
+            color: #adb5bd;
             text-decoration: none;
             transition: color 0.3s ease;
             display: block;
             margin-bottom: 8px;
         }
 
-        .footer-content ul li a:hover {
-            color: #eee;
+        .footer-section ul li a:hover {
+            color: #fff;
         }
 
         .contact-form input[type="text"],
@@ -189,11 +225,11 @@ $conn->close();
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #555;
+            border: 1px solid #6c757d;
             border-radius: 4px;
             box-sizing: border-box;
-            background-color: #444;
-            color: white;
+            background-color: #495057;
+            color: #f8f9fa;
         }
 
         .contact-form button.submit {
@@ -211,70 +247,47 @@ $conn->close();
             background-color: #0056b3;
         }
 
-        .company-info .logo {
+        .company-info .logo-footer {
             max-height: 40px;
             margin-bottom: 10px;
         }
 
-        .company-info .address {
+        .company-info .info-item {
             display: flex;
             align-items: center;
             margin-bottom: 8px;
+            color: #adb5bd;
         }
 
-        .company-info .icons {
-            width: 20px;
-            height: 20px;
+        .company-info .info-item i {
             margin-right: 10px;
-            filter: invert(1);
-        }
-
-        .company-info .info {
-            margin: 0;
+            font-size: 1.1rem;
         }
 
         .copyright {
-            background-color: #222;
-            color: #ccc;
+            background-color: #212529;
+            color: #adb5bd;
             text-align: center;
             padding: 15px 0;
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="aj - Copy-Photoroom.png" alt="Logo" style="max-height: 50px;">
-        </div>
-        <nav>
-            <ul>
-            <li><a href="event.html">Home</a></li>
-                <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
-                <li><a href="find_venue.php">Find Venues</a></li>
-                <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
-            </ul>
-        </nav>
-    </header>
 
     <div class="container">
-        <h2>Vendor Dashboard</h2>
+        <h2><i class="fas fa-tachometer-alt"></i> Vendor Dashboard</h2>
         <?php
             // Display success message if it exists
             if (isset($_SESSION['success_message'])) {
-                echo "<p class='success-message'>" . $_SESSION['success_message'] . "</p>";
+                echo "<p class='success-message'><i class='fas fa-check-circle'></i> " . $_SESSION['success_message'] . "</p>";
                 unset($_SESSION['success_message']); // Clear message
             }
         ?>
-        <h3>My Profile</h3>
+        <h3><i class="fas fa-user"></i> My Profile</h3>
         <table>
             <thead>
                 <tr>
-                    <th>Company Name</th>
-                    <th>Contact</th>
                     <th>Product Name</th>
-                    <th>Description</th>
                     <th>Price</th>
                     <th>Experience</th>
                     <th>Action</th>
@@ -282,63 +295,63 @@ $conn->close();
             </thead>
             <tbody>
                 <tr>
-                    <td><?php echo htmlspecialchars($vendor_profile['company_name']); ?></td>
-                    <td><?php echo htmlspecialchars($vendor_profile['contact']); ?></td>
                     <td><?php echo htmlspecialchars($vendor_profile['product_name']); ?></td>
-                    <td><?php echo htmlspecialchars($vendor_profile['description']); ?></td>
                     <td><?php echo htmlspecialchars($vendor_profile['price']); ?></td>
                     <td><?php echo htmlspecialchars($vendor_profile['experience']); ?> years</td>
                     <td>
-                        <a href="editvendorprofile.php" class="action-btn">Edit Profile</a>
+                        <a href="editvendorprofile.php" class="action-btn"><i class="fas fa-edit"></i> Edit Profile</a>
                     </td>
                 </tr>
             </tbody>
         </table>
         <?php
         if (isset($_SESSION['success'])) {
-            echo '<p class="success-message">' . $_SESSION['success'] . '</p>';
+            echo '<p class="success-message"><i class="fas fa-check-circle"></i> ' . $_SESSION['success'] . '</p>';
             unset($_SESSION['success']);
         }
         ?>
     </div>
 
     <div class="container">
-        <h3>No product listed yet? <a href="add-product.php" style="color: #007bff; text-decoration: none;">Add product here</a></h3>
-    </div>
-
+        <h3><i class="fas fa-box-open"></i> Products</h3>
+        <p>No product listed yet? <a href="add-product.php" class="add-product-link"><i class="fas fa-plus-circle"></i> Add product here</a></p>
+     </div>
+     <li class="nav-item"><a class="nav-link btn btn-danger btn-sm logout-btn" href="logout.php" onclick="return confirm('Are you sure you want to logout?');"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+   
     <footer>
         <div class="footer-content">
-            <div class="contact-form">
-                <h4>Contact Us</h4>
-                <form action = "https://formsubmit.co/jeasonangel0@gmail.com" method = 'POST'>
-                    <input type="text" placeholder="Your Name" id="name">
-                    <input type="email" placeholder="Your Email" id="email">
-                    <textarea placeholder="Your Message"></textarea>
-                    <button type="submit" class="submit">Send</button>
+            <div class="footer-section contact-form">
+                <h4><i class="fas fa-envelope"></i> Contact Us</h4>
+                <form action="https://formsubmit.co/jeasonangel0@gmail.com" method="POST">
+                    <input type="text" placeholder="Your Name" id="name" class="form-control">
+                    <input type="email" placeholder="Your Email" id="email" class="form-control">
+                    <textarea placeholder="Your Message" class="form-control"></textarea>
+                    <button type="submit" class="submit btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
                 </form>
             </div>
-            <div class="sitemap">
-                <h4>Sitemap</h4>
+            <div class="footer-section sitemap">
+                <h4><i class="fas fa-sitemap"></i> Sitemap</h4>
                 <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#">Features</a></li>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">Find Venues</a></li>
-                    <li><a href="#login">Login</a></li>
-                    <li><a href="#signup">Register</a></li>
+                    <li><a href="event.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="feature.html"><i class="fas fa-star"></i> Features</a></li>
+                    <li><a href="#footer"><i class="fas fa-envelope"></i> Contact Us</a></li>
+                    <li><a href="find_venue.php"><i class="fas fa-map-marker-alt"></i> Find Venues</a></li>
+                    <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="register.php"><i class="fas fa-user-plus"></i> Register</a></li>
                 </ul>
             </div>
-            <div class="company-info">
-                <div class="logo">
-                    <img src="aj - Copy-Photoroom.png" alt="Logo" style="max-height: 40px;">
-                </div>
-                <div class="address">
-                    <img src="phone-solid.svg" alt="Phone Icon" class="icons">
+            <div class="footer-section company-info">
+                <h4><i class="fas fa-info-circle"></i> Company Info</h4>
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
                     <p class="info">672073759</p>
                 </div>
-                <div class="address">
-                    <img src="envelope-solid.svg" alt="Email Icon" class="icons">
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
                     <p class="info">AJEvenemential@gmail.com</p>
+                </div>
+                <div class="logo-footer">
+                    <img src="aj - Copy-Photoroom.png" alt="Logo" style="max-height: 40px;">
                 </div>
             </div>
         </div>
@@ -346,5 +359,7 @@ $conn->close();
     <div class="copyright">
         <p>&copy; 2025 Event Management System. All rights reserved. AJ EVENEMENTIAL</p>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

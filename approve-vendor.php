@@ -28,10 +28,9 @@ if (isset($_GET['id'])) {
     $vendor_email_result = $conn->query($vendor_email_sql);
     if ($vendor_email_result->num_rows > 0) {
       $vendor = $vendor_email_result->fetch_assoc();
-            $vendor_name = $vendor['company_name'];
-            $vendor_email = $vendor['email'];
+      $vendor_name = $vendor['company_name'];
+      $vendor_email = $vendor['email'];
       $temporary_password = "0000";
-      $login_link = "your_website_url/login.php";
       
       // Send email notification using PHPMailer
       $mail = new PHPMailer(true);
@@ -43,7 +42,7 @@ if (isset($_GET['id'])) {
         $mail->Host       = 'smtp.gmail.com'; 
         $mail->SMTPAuth   = true;
         $mail->Username   = 'jeasonangel0@gmail.com'; // SMTP username
-        $mail->Password   = 'wjjb ibqd gxlw nveo';         // SMTP password
+        $mail->Password   = 'jbzy mrza bpak caap';         // SMTP password
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption; `PHPMailer::ENCRYPTION_SMTPS` encouraged
         $mail->Port       = 587;                // TCP port to connect to, use 465 for `PHPMailer::ENCRYPTION_SMTPS` above
 
@@ -57,9 +56,8 @@ if (isset($_GET['id'])) {
         $mail->Body    = "Dear " . $vendor_name . ",\n\n";
         $mail->Body   .= "Your vendor registration has been approved by our team.\n";
         $mail->Body   .= "Your temporary password for login is: " . $temporary_password . "\n";
-        $mail->Body   .= "Please use this password to log in for the first time at: " . $login_link . "\n";
-        $mail->Body   .= "We recommend you change your password after your first login.\n\n";
-        $mail->Body   .= "Sincerely,\nThe Event Management Team";
+        $mail->Body   .= "Please use this password to log in for the first time '\n'";
+        $mail->Body   .= "Sincerely,'\n' The Event Management Team";
 
         $mail->send();
         $_SESSION['success'] = "Vendor approved and notification sent.";

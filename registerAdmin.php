@@ -3,7 +3,7 @@ ob_start();
 session_start();
 
 if (isset($_SESSION['error'])) {
-    echo '<p style="color: green;">' . $_SESSION['error'] . '</p>';
+    echo '<p style="color: red;">' . $_SESSION['error'] . '</p>';
     unset($_SESSION['error']);
 }
 
@@ -125,7 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <ul>
                 <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
+                <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
                 <li><a href="register.php">Register</a></li>

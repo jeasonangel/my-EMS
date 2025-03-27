@@ -14,58 +14,83 @@ if ($conn->connect_error) {
 
 $client_id = $_SESSION['user_id'];
 
+// Function to handle database errors
+function handle_db_error($conn, $sql) {
+    $_SESSION['error_message'] = "Database error: " . $conn->error . " (Query: " . $sql . ")";
+    header("Location: client-dashboard.php");
+    exit();
+}
+
 // Delete event
 if (isset($_POST['delete_event'])) {
-    $sql_delete_expenses = "DELETE FROM expenses WHERE event_id IN (SELECT ID FROM events WHERE client_id = '$client_id' AND ID = '" . $_POST['ID'] . "')";
+    $event_id = $_POST['ID'];
+
+    $sql_delete_expenses = "DELETE FROM expenses WHERE event_id IN (SELECT ID FROM events WHERE client_id = '$client_id' AND ID = '$event_id')";
     if ($conn->query($sql_delete_expenses)) {
-        $sql_delete_event = "DELETE FROM events WHERE ID = '" . $_POST['ID'] . "' AND client_id = '$client_id'";
+        $sql_delete_event = "DELETE FROM events WHERE ID = '$event_id' AND client_id = '$client_id'";
         if ($conn->query($sql_delete_event)) {
             unset($_SESSION['event_id']);
             $_SESSION['success_message'] = "Event deleted successfully.";
-            header("Location: client-dashboard.php");
-            exit();
         } else {
-            $_SESSION['error_message'] = "Error deleting event: " . $conn->error;
-            header("Location: client-dashboard.php");
-            exit();
+            handle_db_error($conn, $sql_delete_event);
         }
     } else {
-        $_SESSION['error_message'] = "Error deleting associated expenses: " . $conn->error;
-        header("Location: client-dashboard.php");
-        exit();
+        handle_db_error($conn, $sql_delete_expenses);
     }
+    header("Location: client-dashboard.php");
+    exit();
+}
+
+// Process Event Update
+if (isset($_POST['update_event'])) {
+    $event_id = $_POST['event_id'];
+    $event_name = $_POST['event_name'];
+    $date = $_POST['date'];
+    $time = $_POST['time'];
+    $type = $_POST['type'];
+    $budget = $_POST['budget'];
+
+    $sql_update_event = "UPDATE events SET event_name = '$event_name', date = '$date', time = '$time', type = '$type', budget = '$budget' WHERE ID = '$event_id' AND client_id = '$client_id'";
+
+    if ($conn->query($sql_update_event)) {
+        $_SESSION['success_message'] = "Event updated successfully.";
+    } else {
+        handle_db_error($conn, $sql_update_event);
+    }
+    header("Location: client-dashboard.php");
+    exit();
 }
 
 // Fetch events created by the logged-in client
 $sql_events = "SELECT ID, event_name, date, time, type FROM events WHERE client_id = '$client_id' ORDER BY date DESC, time DESC";
 $result_events = $conn->query($sql_events);
-$clients_events = [];
+$clients_events = []; // Initialize as an empty array
 if ($result_events && $result_events->num_rows > 0) {
     while ($row = $result_events->fetch_assoc()) {
-        $clients_events[] = $row;
+        $clients_events[] = $row; // Append each row to the array
     }
 }
 
 // Fetch expenses grouped by event
 $sql_expenses_summary = "SELECT
-                            ev.ID AS event_id,
-                            ev.event_name,
-                            e.expense_id,
-                            e.category,
-                            e.budget_limit
-                        FROM expenses e
-                        JOIN events ev ON e.event_id = ev.ID
-                        WHERE ev.client_id = '$client_id'
-                        ORDER BY ev.event_name, e.category";
+                                    ev.ID AS event_id,
+                                    ev.event_name,
+                                    e.expense_id,
+                                    e.category,
+                                    e.budget_limit
+                                FROM expenses e
+                                JOIN events ev ON e.event_id = ev.ID
+                                WHERE ev.client_id = '$client_id'
+                                ORDER BY ev.event_name, e.category";
 $result_expenses_summary = $conn->query($sql_expenses_summary);
-$expenses_summary = [];
+$expenses_summary = []; // Initialize as an empty array
 if ($result_expenses_summary && $result_expenses_summary->num_rows > 0) {
     while ($row = $result_expenses_summary->fetch_assoc()) {
         $event_id = $row['event_id'];
         if (!isset($expenses_summary[$event_id])) {
             $expenses_summary[$event_id] = [
                 'event_name' => htmlspecialchars($row['event_name']),
-                'expenses' => []
+                'expenses' => [] // Initialize the 'expenses' array for each event
             ];
         }
         $expenses_summary[$event_id]['expenses'][] = [
@@ -76,9 +101,7 @@ if ($result_expenses_summary && $result_expenses_summary->num_rows > 0) {
     }
 }
 
-$client_id = $_SESSION['user_id']; 
-
-// Fetch the client's events and their expenses
+// Fetch the client's events and their expenses for the report
 $sql = "SELECT
             ev.event_name,
             ev.date,
@@ -95,498 +118,381 @@ $sql = "SELECT
         ORDER BY ev.event_name, e.category";
 
 $result = $conn->query($sql);
-$client_report_data = [];
+$client_report_data = []; // Initialize as an empty array
 if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $client_report_data[] = $row;
+        $client_report_data[] = $row; // Append each row to the array
     }
 }
-$conn->close();
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" type="text/css" href="style.css">
     <style>
-        .expense-summary-section {
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
+        .event-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 1rem;
         }
 
-        .expense-summary-section h3 {
-            color: #007bff;
-            margin-bottom: 15px;
+        .event-actions a {
+            margin-right: 0.5rem;
         }
 
-        .expense-summary-section h4 {
-            color: #333;
-            margin-top: 15px;
-            margin-bottom: 10px;
-        }
-
-        .expense-summary-section table {
+        .expense-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 1rem;
         }
 
-        .expense-summary-section th, .expense-summary-section td {
-            border: 1px solid #ddd;
-            padding: 8px;
+        .expense-table th,
+        .expense-table td {
+            border: 1px solid #dee2e6;
+            padding: 0.5rem;
             text-align: left;
         }
 
-        .expense-summary-section th {
-            background-color: #f9f9f9;
+        .expense-table th {
+            background-color: #f8f9fa;
         }
 
-        .modify-expense-btn {
-            background-color: #ffc107; 
-            color: #333;
-            padding: 6px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 0.8em;
-            margin-right: 5px;
+        .variance.positive {
+            color: green;
         }
 
-        .modify-expense-btn:hover {
-            background-color: #e0a800;
+        .variance.negative {
+            color: red;
         }
-                body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 0;
-            color: #333;
-            }
-            header {
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            }
-            .logo img {
-            height: 50px; 
-            }
-            nav ul {
-            list-style: none;
-            display: flex;
-            }
-            nav ul li {
-            margin-left: 20px;
-            }
-            nav ul li a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            }
-            nav ul li a:hover {
-            color: #007bff;
-            }
-            .dashboard-container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            grid-gap: 20px;
-            }
-            /* Event Section */
-            .events-section {
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            }
-            .events-section h2 {
-            color: #007bff;
-            margin-bottom: 20px;
-            }
-            .event-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            grid-gap: 15px;
-            }
-            .event-item {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            }
-            .event-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-            }
-            .event-details h4 {
-            margin-top: 0;
-            color: #555;
-            }
-            .event-details p {
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            color: #777;
-            }
-            .event-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-            column-gap: 10px;
-            } 
-            .event-actions a {
-            display: inline-block;
+
+        .logout {
+            background-color: rgb(239, 20, 4);
+            color: white;
+            margin-left: 1100px;
             padding: 8px 12px;
             text-decoration: none;
-            background-color: #007bff;
-            color: white;
             border-radius: 4px;
-            font-size: 0.85em;
-            margin-left: 5px;
-            transition: background-color 0.2s;
-            }
-            .event-actions a:hover {
-            background-color: #0056b3;
-          
-            }
-            .no-events {
-            text-align: center;
-            color: #777;
-            font-style: italic;
-            }
-            /* Expenses Section */
-            .expenses-section {
-            background-color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 20px;
-            }
-            .expenses-section h3 {
-            color: #007bff;
-            margin-bottom: 20px;
-            }
-            table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-            }
-            th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-            }
-            th {
-            background-color: #f9f9f9;
-            }
-            /* Buttons */
-            button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            }
-            button:hover {
-            background-color: #0056b3;
-            }
-            .btn {
-            color: white;
-            text-decoration: none;
-            }
-            /* Footer */
-            footer {
-            background-color: #fff;
-            padding: 30px 20px;
-            text-align: center;
-            margin-top: 30px;
-            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-            }
-            .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            grid-gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            }
-            .contact-form h4, .sitemap h4, .company-info h4 {
-            color: #007bff;
-            margin-bottom: 15px;
-            }
-            .contact-form input, .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            }
-            .sitemap ul {
-            list-style: none;
-            padding: 0;
-            }
-            .sitemap ul li {
-            margin-bottom: 5px;
-            }
-            .sitemap ul li a {
-            text-decoration: none;
-            color: #555;
-            }
-            .sitemap ul li a:hover {
-            color: #007bff;
-            }
-            .company-info .logo img {
-            height: 40px;
-            margin-bottom: 10px;
-            }
-            .company-info .address {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            }
-            .company-info .icons {
-            height: 20px;
-            margin-right: 10px;
-            }
-            .company-info .info {
-            font-size: 0.9em;
-            color: #777;
-            }
-            .copyright {
-            background-color: #f9f9f9;
-            padding: 15px 20px;
-            text-align: center;
-            font-size: 0.85em;
-            color: #555;
-            }
-            /* Responsive Design */
-            @media (max-width: 768px) {
-            .dashboard-container {
-                grid-template-columns: 1fr; /* Stack on smaller screens */
-            }
-            
-            nav ul {
-                flex-direction: column;
-                align-items: center;
-            }
-            nav ul li {
-                margin: 5px 0;
-            }
-            } 
+        }
+
+        .logout:hover {
+            background-color: darkred;
+        }
+        header {
+    background-color: #0b315a;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+nav{
+    padding-top: -190px;
+    margin-bottom: 60px;
+}
+header{
+    height: 100px;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+}
+header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Adjust grid columns as needed */
+    align-items: center;
+}
+nav{
+   margin-right: 30px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        grid-template-columns: 1fr; /* Stack elements on smaller screens */
+        text-align: center;
+    }
+}
+
+.logo{
+    margin-top: -20px;
+}
     </style>
 </head>
+
 <body>
 <header>
-    <div class="logo">
-        <img src="EMS.jpg" alt="Event Management System Logo">
-    </div>
-    <nav>
-        <ul>
-        <li><a href="event.html">Home</a></li>
+        <div class="logo">
+            <img src="aj - Copy-Photoroom.png" class="logo">
+        </div>
+    
+    
+        <nav>
+            <ul>
+                <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
+                <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
-        </ul>
-    </nav>
-</header>
-<div class="dashboard-container">
-    <section class="events-section">
-        <h2>Welcome to Your Dashboard, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
+                <li><a href="getStarted.php">Register</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container mt-4">
+        <h2 class="mb-4">Client Dashboard</h2>
+
         <?php if (isset($_SESSION['success_message'])): ?>
-            <p style="color: green;"><?php echo $_SESSION['success_message']; ?></p>
+            <div class="alert alert-success" role="alert">
+                <?php echo $_SESSION['success_message']; ?>
+            </div>
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
         <?php if (isset($_SESSION['error_message'])): ?>
-            <p style="color: red;"><?php echo $_SESSION['error_message']; ?></p>
+            <div class="alert alert-danger" role="alert">
+                <?php echo $_SESSION['error_message']; ?>
+            </div>
             <?php unset($_SESSION['error_message']); ?>
         <?php endif; ?>
 
-        <h3>Your Created Events:</h3>
-        <div class="event-list">
-            <?php if (!empty($clients_events)): ?>
-                <?php foreach ($clients_events as $event): ?>
-                    <div class="event-item">
-                        <div class="event-details">
-                            <h4><?php echo htmlspecialchars($event['event_name']); ?></h4>
-                            <p>Date: <?php echo htmlspecialchars($event['date']); ?></p>
-                            <p>Time: <?php echo htmlspecialchars($event['time']); ?></p>
-                            <p>Type: <?php echo htmlspecialchars($event['type']); ?></p>
+        <section class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Your Events</h3>
+                <a href="create-event.php" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Event
+                </a>
+            </div>
+
+            <div class="row">
+                <?php if (!empty($clients_events)): ?>
+                    <?php foreach ($clients_events as $event): ?>
+                        <div class="col-md-6">
+                            <div class="card event-card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($event['event_name']); ?></h5>
+                                    <p class="card-text">
+                                        <i class="fas fa-calendar-alt"></i> Date:
+                                        <?php echo htmlspecialchars($event['date']); ?><br>
+                                        <i class="fas fa-clock"></i> Time:
+                                        <?php echo htmlspecialchars($event['time']); ?><br>
+                                        <i class="fas fa-tags"></i> Type:
+                                        <?php echo htmlspecialchars($event['type']); ?>
+                                    </p>
+                                    <div class="event-actions">
+                                        <a href="expenses.php?event_id=<?php echo $event['ID']; ?>"
+                                            class="btn btn-sm btn-info">
+                                            <i class="fas fa-money-bill-wave"></i> Budget
+                                        </a>
+                                        <a href="?edit_event=<?php echo $event['ID']; ?>"
+                                            class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <form method="post" style="display:inline;">
+                                            <input type="hidden" name="ID" value="<?php echo $event['ID']; ?>">
+                                            <button type="submit" name="delete_event"
+                                                class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure you want to delete this event? This will also delete all associated expenses.');">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="event-actions">
-                            <a href="expenses.php?event_id=<?php echo $event['ID']; ?>">Budget</a>
-                            <form method="post" style="display:inline;">
-                                <input type="hidden" name="ID" value="<?php echo $event['ID']; ?>">
-                                <button type="submit" name="delete_event" onclick="return confirm('Are you sure you want to delete this event? This will also delete all associated expenses.');">Delete</button>
-                            </form>
-                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12">
+                        <p class="text-muted">You haven't created any events yet.</p>
                     </div>
+                <?php endif; ?>
+            </div>
+        </section>
+
+        <?php if (isset($_GET['edit_event'])): ?>
+            <?php
+            $edit_event_id = $_GET['edit_event'];
+            $sql_edit_event = "SELECT ID, event_name, date, time, type, budget FROM events WHERE ID = '$edit_event_id' AND client_id = '$client_id'";
+            $result_edit_event = $conn->query($sql_edit_event);
+            if ($result_edit_event && $result_edit_event->num_rows > 0) {
+                $event_to_edit = $result_edit_event->fetch_assoc();
+                ?>
+                <section class="mb-4">
+                    <h3>Edit Event Details</h3>
+                    <form method="post">
+                        <input type="hidden" name="event_id" value="<?php echo $event_to_edit['ID']; ?>">
+                        <div class="mb-3">
+                            <label for="event_name" class="form-label">Event Name:</label>
+                            <input type="text" name="event_name" id="event_name" class="form-control"
+                                value="<?php echo htmlspecialchars($event_to_edit['event_name']); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date:</label>
+                            <input type="date" name="date" id="date" class="form-control"
+                                value="<?php echo htmlspecialchars($event_to_edit['date']); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Time:</label>
+                            <input type="time" name="time" id="time" class="form-control"
+                                value="<?php echo htmlspecialchars($event_to_edit['time']); ?>" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Type:</label>
+                            <select name="type" id="type" class="form-select" required>
+                                <option value="Wedding" <?php if ($event_to_edit['type'] == 'Wedding')
+                                    echo 'selected'; ?>>Wedding</option>
+                                <option value="Birthday" <?php if ($event_to_edit['type'] == 'Birthday')
+                                    echo 'selected'; ?>>Birthday</option>
+                                <option value="Conference" <?php if ($event_to_edit['type'] == 'Conference')
+                                echo 'selected'; ?>>Conference</option>
+                                <option value="Other" <?php if ($event_to_edit['type'] == 'Other')
+                                    echo 'selected'; ?>>Other</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="budget" class="form-label">Budget:</label>
+                            <input type="number" name="budget" id="budget" class="form-control"
+                                value="<?php echo htmlspecialchars($event_to_edit['budget']); ?>" required>
+                        </div>
+                        <button type="submit" name="update_event" class="btn btn-success">
+                            <i class="fas fa-save"></i> Update Event
+                        </button>
+                    </form>
+                </section>
+                <?php
+            } else {
+                echo "<p class='alert alert-warning'>Event not found or you do not have permission to edit it.</p>";
+            }
+            ?>
+        <?php endif; ?>
+
+        <section class="mb-4">
+            <h3>Your Expenses Summary</h3>
+            <?php if (!empty($expenses_summary)): ?>
+                <?php foreach ($expenses_summary as $event_id => $event_data): ?>
+                    <h4><?php echo $event_data['event_name']; ?></h4>
+                    <?php if (!empty($event_data['expenses'])): ?>
+                        <table class="expense-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Budget Limit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($event_data['expenses'] as $expense): ?>
+                                    <tr>
+                                        <td><?php echo $expense['category']; ?></td>
+                                        <td><?php echo $expense['budget_limit']; ?></td>
+                                        <td>
+                                            <a href="modify-expense.php?expense_id=<?php echo $expense['expense_id']; ?>"
+                                                class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-pencil-alt"></i> Modify
+                                            </a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    <?php else: ?>
+                        <p class="text-muted">No expenses added for this event.</p>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             <?php else: ?>
-                <p class="no-events">You haven't created any events yet.</p>
-                <p class="no-events"><a href="create-event.php">Create your first event!</a></p>
+                <p class="text-muted">No expenses recorded for any of your events yet.</p>
             <?php endif; ?>
-        </div>
-    </section>
+        </section>
 
-    <section class="expense-summary-section">
-        <h3>Your Expenses Summary</h3>
-        <?php if (!empty($expenses_summary)): ?>
-            <?php foreach ($expenses_summary as $event_id => $event_data): ?>
-                <h4><?php echo $event_data['event_name']; ?></h4>
-                <?php if (!empty($event_data['expenses'])): ?>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Category</th>
-                            <th>Budget Limit</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ($event_data['expenses'] as $expense): ?>
-                            <tr>
-                                <td><?php echo $expense['category']; ?></td>
-                                <td><?php echo $expense['budget_limit']; ?></td>
-                                <td>
-                                <a href="modify-expense.php?expense_id=<?php echo $expense['expense_id']; ?>" class="modify-expense-btn">Modify</a>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>No expenses added for this event.</p>
-                <?php endif; ?>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <p>No expenses recorded for any of your events yet.</p>
-        <?php endif; ?>
-    </section>
-    <h2>Report</h2>
-    <?php if (!empty($client_report_data)): ?>
-        <table>
-                <thead>
-                    <tr>
-                        <th>Event Name</th>
-                        <th>Date</th>
-                        <th>Type</th>
-                        <th>Event Budget</th>
-                        <th>Expense Category</th>
-                        <th>Expense Budget</th>
-                        <th>Expense Actual Cost</th>
-                        <th>Expense Variance</th>
-                        <th>Expense Description</th>
-                    </tr>
-                </thead>
+        </section>
 
-            <tbody>
-                <?php
-                    $current_event = null;
-                    foreach ($client_report_data as $row):
-                        if ($row['event_name'] !== $current_event):
-                            if ($current_event !== null): ?>
-                                <tr style="background-color: #f9f9f9;"><td colspan="9">&nbsp;</td></tr>
-                            <?php endif; ?>
-                                <tr style="background-color: #e9ecef;">
-                                    <td><strong><?php echo htmlspecialchars($row['event_name']); ?></strong></td>
-                                    <td><strong><?php echo htmlspecialchars($row['date']); ?></strong></td>
-                                    <td><strong><?php echo htmlspecialchars($row['type']); ?></strong></td>
-                                    <td><strong><?php echo htmlspecialchars(number_format($row['event_budget'], 2)); ?></strong></td>
-                                    <td colspan="5"></td>
-                                </tr>
-
-                                  <?php
-                               $current_event = $row['event_name'];
-                            endif;
-                                 ?>
-
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td><?php echo htmlspecialchars($row['expense_category'] ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars(number_format($row['expense_budget_limit'], 2) ?? 'N/A'); ?></td>
-                            <td><?php echo htmlspecialchars(number_format($row['expense_actual_cost'], 2) ?? 'N/A'); ?></td>
-                            <td class="variance <?php
-                                $budget = $row['expense_budget_limit'] ?? 0;
-                                $actual = $row['expense_actual_cost'] ?? 0;
-                                $variance = $budget - $actual;
-                                echo $variance >= 0 ? 'positive' : 'negative';
-                            ?>">
-                                <?php echo htmlspecialchars(number_format($variance, 2)); ?>
-                            </td>
-                            <td><?php echo htmlspecialchars($row['expense_description'] ?? 'N/A'); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-            </tbody>
-
-        </table>
-
-        <?php else: ?>
-            <p>No events or expenses recorded for your account yet.</p>
-        <?php endif; ?>
-</div>
-
-<footer>
-
-    <div class="footer-content">
-        <div class="contact-form">
-            <h4>Contact Us</h4>
-            <form class="contact">
-                <input type="text" placeholder="Your Name" id="name">
-                <input type="email" placeholder="Your Email" id="email">
-                <textarea placeholder="Your Message"></textarea>
-                <button type="submit" class="submit">Send</button>
+        <section class="mb-4">
+            <h3>Report</h3>
+            <form method="post" action="generate_report.php" target="_blank">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Generate PDF Report
+                </button>
             </form>
+            <a href="logout.php" class="logout btn btn-danger" onclick="return confirm('Are you sure you want to logout?');">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            </section>
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Contact Us</h4>
+                    <form class="contact">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" placeholder="Your Name" id="name">
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" placeholder="Your Email" id="email">
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" placeholder="Your Message"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary submit">Send</button>
+                    </form>
+                </div>
+                <div class="col-md-4">
+                    <h4>Sitemap</h4>
+                    <ul class="list-unstyled">
+                        <li><a href="event.html" class="nav-link p-0 text-muted">Home</a></li>
+                        <li><a href="feature.html" class="nav-link p-0 text-muted">Features</a></li>
+                        <li><a href="service.php" class="nav-link p-0 text-muted">Services</a></li>
+                        <li><a href="find_venue.php" class="nav-link p-0 text-muted">Find Venues</a></li>
+                        <li><a href="login.php" class="nav-link p-0 text-muted">Login</a></li>
+                        <li><a href="getStarted.php" class="nav-link p-0 text-muted">Register</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Company Info</h4>
+                    <div class="logo mb-2">
+                        <img src="aj - Copy-Photoroom.png" height="40">
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-phone text-muted me-2"></i>
+                        <p class="mb-0 text-muted">672073759</p>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-envelope text-muted me-2"></i>
+                        <p class="mb-0 text-muted">AJEvenemential@gmail.com</p>
+                    </div>
+                </div>
+            </div>
         </div>
+    </footer>
 
-        <div class="sitemap">
-            <h4>Sitemap</h4>
-            <ul>
-            <li><a href="event.html">Home</a></li>
-                <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
-                <li><a href="find_venue.php">Find Venues</a></li>
-                <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
-            </ul>
-        </div>
-
-        <div class="company-info">
-            <div class="logo">
-                <img src="EMS.jpg" alt="Event Management System Logo">
-            </div>
-            <div class="address">
-                <img src="phone-solid.svg" class="icons" alt="Phone Icon">
-                <p class="info">672073759</p>
-            </div>
-            <div class="address">
-                <img src="envelope-solid.svg" class="icons" alt="Email Icon">
-                <p class="info">AJEvenemential@gmail.com</p>
-            </div>
-        </div>
-        
+    <div class="bg-light text-center py-3">
+        <p class="mb-0 text-muted">&copy; 2025 Event Management System. All rights reserved. AJ EVENEMENTIAL</p>
     </div>
-</footer>
 
-<div class="copyright">
-    <p>&copy; 2025 Event Management System. All rights reserved. AJ EVENEMENTIAL</p>
-</div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
+<?php
+// Close the connection at the very end of the PHP script
+$conn->close();
+?>

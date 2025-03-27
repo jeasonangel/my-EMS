@@ -1,6 +1,9 @@
 <?php
 session_start();
-
+if (isset($_SESSION['success'])) {
+    echo '<p style="color: green;">' . $_SESSION['success'] . '</p>';
+    unset($_SESSION['success']);
+  }
 // Database connection
 $conn = new mysqli('localhost', 'root', '', 'eventmgtsyst');
 if ($conn->connect_error) {
@@ -111,7 +114,7 @@ if ($conn->connect_error) {
             <ul>
             <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
+                <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
                 <li><a href="register.php">Register</a></li>
@@ -130,9 +133,6 @@ if ($conn->connect_error) {
     <input type="email" name="email" placeholder="Email" required><br>
     <input type="password" name="password" placeholder="Password" required><br>
     <button type="submit">Login</button>
-    <div class="register-link">
-        <p>Not a member? <a href="register.php">Register</a></p>
-    </div>
 </form>
         </form>
     </div>
@@ -152,7 +152,7 @@ if ($conn->connect_error) {
                 <ul>
                 <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
+                <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
                 <li><a href="register.php">Register</a></li>

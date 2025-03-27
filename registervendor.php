@@ -1,9 +1,9 @@
 <?php
 session_start();
-//if (isset($_SESSION['success'])) {
-  //echo '<p style="color: green;">' . $_SESSION['success'] . '</p>';
-  //unset($_SESSION['success']);
-//}
+if (isset($_SESSION['error'])) {
+  echo '<p style="color: red;">' . $_SESSION['error'] . '</p>';
+  unset($_SESSION['error']);
+}
       // 3. Database connection 
       $conn = new mysqli('localhost', 'root', '', 'eventmgtsyst');
       if ($conn->connect_error) {
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 if ($conn->query($sql) === TRUE) {
   // Vendor registration successful
-  $_SESSION['success'] = "Registration successful. Please wait for admin approval.";
+  $_SESSION['success'] = "<script>alert('Registration successful. Please wait for admin approval.')</script>";
   header('Location: getStarted.php');
   exit;
 } else {

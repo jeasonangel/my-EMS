@@ -17,10 +17,10 @@
             <ul>
                 <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
+                <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
+                <li><a href="getStarted.php">Register</a></li>
             </ul>
         </nav>
     </header>
@@ -28,7 +28,7 @@
     <section id="home" class="hero">
         <div class="hero-content">
             <h1>Welcome to Your Event Management Solution</h1>
-            <p>Plan your perfect event with ease and efficiency.</p>
+            <p>Plan your perfect event with ease and efficiency.</p><br><br>
             <a href="getStarted.php" class="btn">Get Started</a>
         </div>
     </section>
@@ -67,6 +67,9 @@
                     <input type="text" placeholder="Your Name">
                     <input type="email" placeholder="Your Email">
                     <textarea placeholder="Your Message"></textarea>
+                    <div class="form-group text-center">
+                            <div class="g-recaptcha" data-sitekey="<?= CONTACTFORM_RECAPTCHA_SITE_KEY ?>"></div>
+                        </div>
                     <button type="submit">Send</button>
                 </form>
             </div>
@@ -76,7 +79,7 @@
                 <ul>
                     <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</li>
+                <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
                 <li><a href="register.php">Register</a></li>
