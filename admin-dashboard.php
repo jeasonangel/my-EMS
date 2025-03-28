@@ -79,7 +79,7 @@ if ($expenses_result === false) {
 }
 $expenses = $expenses_result->fetch_all(MYSQLI_ASSOC);
 
-// Fetch all expenses grouped by event to show a summary on the dashboard
+// Fetch all expenses grouped by event 
 $expenses_summary_sql = "SELECT events.ID AS event_id, events.event_name, clients.name AS client_name, COUNT(expenses.expense_id) AS total_expenses
                             FROM expenses
                             JOIN events ON expenses.event_id = events.ID
@@ -218,7 +218,7 @@ $conn->close();
         }
 
         .approve-btn {
-            background-color: #28a745; /* Green */
+            background-color: #28a745; 
         }
 
         .approve-btn:hover {
@@ -226,7 +226,7 @@ $conn->close();
         }
 
         .reject-btn {
-            background-color: #dc3545; /* Red */
+            background-color: #dc3545; 
         }
 
         .reject-btn:hover {
@@ -234,7 +234,7 @@ $conn->close();
         }
 
         .manage-btn {
-            background-color: #ffc107; /* Yellow */
+            background-color: #ffc107; 
             color: #212529;
             padding: 8px 15px;
             border-radius: 5px;

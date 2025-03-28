@@ -196,7 +196,7 @@ $conn->close();
                         <td><?php echo htmlspecialchars($expense['category']); ?>
                             <input type="hidden" name="category[]" value="<?php echo htmlspecialchars($expense['category']); ?>">
                             <input type="hidden" name="budget_limit[]" value="<?php echo htmlspecialchars($expense['budget_limit']); ?>">
-                            <input type="hidden" name="expense_id[]" value="<?php // You might not need a specific expense_id from the 'expenses' table here ?>">
+                            <input type="hidden" name="expense_id[]" value="<?php  ?>">
                         </td>
                         <td><?php echo htmlspecialchars(number_format($expense['budget_limit'], 2)); ?></td>
                         <td>

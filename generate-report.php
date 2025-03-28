@@ -5,9 +5,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'admin') {
     exit;
 }
 
-require_once __DIR__ . '/vendor/autoload.php'; // Ensure Composer autoloader is included
+require_once __DIR__ . '/vendor/autoload.php'; 
 
-//use TCPDF;
 
 // Database connection
 $conn = new mysqli('localhost', 'root', '', 'eventmgtsyst');
@@ -50,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate-report'])) {
     // Set image scale factor
     $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
 
-    // Set some language-dependent strings (optional)
+    // Set some language-dependent strings 
     if (@file_exists(dirname(__FILE__).'/lang/eng.php')) {
         require_once(dirname(__FILE__).'/lang/eng.php');
         $pdf->setLanguageArray($l);
@@ -66,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate-report'])) {
     $pdf->AddPage();
 
     $html = '<h1>Admin Report</h1>';
-    $generation_time = date('Y-m-d H:i:s');
+    $generation_time = date('Y-m-d');
     $html .= '<p>Generated on: ' . $generation_time . '</p>';
 
     if ($report_type === 'expense_report') {
@@ -148,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['generate-report'])) {
                 $html .= '<td align="right">' . htmlspecialchars(number_format($row['price'], 2)) . '</td>';
                 $html .= '<td align="center">';
                 if ($row['image']) {
-                    $img_path = __DIR__ . '/' . $row['image']; // Adjust path if needed
+                    $img_path = __DIR__ . '/' . $row['image']; 
                     if (file_exists($img_path)) {
                         $html .= '<img src="' . $img_path . '" height="50">';
                     } else {

@@ -220,7 +220,7 @@ nav ul li a {
 }
 header {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr; /* Adjust grid columns as needed */
+    grid-template-columns: 1fr 2fr 1fr; 
     align-items: center;
 }
 nav{

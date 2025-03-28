@@ -146,10 +146,10 @@ $conn->close();
             <ul>
                 <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
-                <li><a href="#footer">Contact Us</a></li>
+                <li><a href="service.php">Services</a></li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
+                <li><a href="getStared.php">Register</a></li>
             </ul>
         </nav>
     </header>
@@ -220,9 +220,9 @@ $conn->close();
                     <li><a href="#home"><i class="fas fa-home"></i> Home</a></li>
                     <li><a href="feature.html"><i class="fas fa-star"></i> Features</a></li>
                     <li><a href="service.php"><i class="fas fa-concierge-bell"></i> Services</a></li>
-                    <li><a href="#find-venues"><i class="fas fa-map-marker-alt"></i> Find Venues</a></li>
-                    <li><a href="#login"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-                    <li><a href="#signup"><i class="fas fa-user-plus"></i> SignUp</a></li>
+                    <li><a href="find_venue.php"><i class="fas fa-map-marker-alt"></i> Find Venues</a></li>
+                    <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                    <li><a href="getStarted"><i class="fas fa-user-plus"></i> Register/a></li>
                 </ul>
             </div>
 

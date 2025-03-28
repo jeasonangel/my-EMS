@@ -49,11 +49,10 @@ if (isset($_SESSION['success'])) {
     
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="event.html">Home</a></li>
                 <li><a href="feature.html">Features</a></li>
                 <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
-                <li><a href="contactUs.php">Contact Us</a></li>
                 <li><a href="login.php">Login</a></li>
                 <li><a href="getStarted.php">Register</a></li>
             </ul>
@@ -97,7 +96,7 @@ if (isset($_SESSION['success'])) {
                 <li><a href="service.php">Services</li>
                 <li><a href="find_venue.php">Find Venues</a></li>
                 <li><a href="login.php">Login</a></li>
-                <li><a href="register.php">Register</a></li>
+                <li><a href="getStarted.php">Register</a></li>
                 </ul>
             </div>
 

@@ -2,7 +2,7 @@
 session_start();
 
 require_once __DIR__ . '/vendor/autoload.php';
-//require_once('tc-lib-pdf/src/tcpdf.php');
+
 
 // Check if the user is logged in as a client
 if (!isset($_SESSION['logged_in']) || $_SESSION['role'] !== 'client') {
@@ -18,7 +18,7 @@ if ($conn->connect_error) {
 
 $client_id = $_SESSION['user_id'];
 
-// Fetch the client's events and their expenses for the report (same query as in the dashboard)
+// Fetch the client's events and their expenses for the report 
 $sql = "SELECT
             ev.event_name,
             ev.date,
@@ -42,8 +42,6 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Include the TCPDF library (you'll need to download and install it via Composer)
-// require_once('tcpdf/tcpdf.php'); // Adjust the path if necessary (Composer handles this)
 
 // Create a new PDF document
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
@@ -94,7 +92,7 @@ $pdf->AddPage();
 
 // Content for the PDF
 $html = '<h1>Client Event Report for ' . htmlspecialchars($_SESSION['username'] ?? 'Guest') . '</h1>';
-$html .= '<p>Generated on: ' . date('Y-m-d H:i:s') . '</p>';
+$html .= '<p>Generated on: ' . date('Y-m-d') . '</p>';
 
 if (!empty($client_report_data)) {
     $html .= '<table border="1" cellpadding="5">';

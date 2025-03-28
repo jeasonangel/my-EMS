@@ -69,7 +69,7 @@ $conn->close();
         }
 
         .over-budget {
-            background-color: #ffe0e0; /* Light red */
+            background-color: #ffe0e0; 
         }
 
         .variance-positive {

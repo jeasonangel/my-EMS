@@ -108,9 +108,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li><a href="#home">Home</a></li>
                     <li><a href="feature.html">Features</a></li>
                     <li><a href="service.php">Services</li>
-                    <li><a href="#find-venues">Find Venues</a></li>
-                    <li><a href="#login">Login</a></li>
-                    <li><a href="#signup">SignUp</a></li>
+                    <li><a href="find_venue.php">Find Venues</a></li>
+                    <li><a href="login.php">Login</a></li>
+                    <li><a href="getSarted.php">Register</a></li>
                 </ul>
             </div>
             <div class="company-info">
